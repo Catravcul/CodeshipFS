@@ -1,18 +1,19 @@
-import 'dotenv/config.js'
+import { getConfig } from './config.js'
 import { join } from 'path'
 import { unlink } from 'fs'
-import { get, request } from 'https'
+import { get } from 'https'
 import fileupload from 'express-fileupload'
 import express from 'express'
 const route = express()
+const config = getConfig()
 
 route.use((req, res, next) => {
-    const origins = process.env.ALLOWED_URLS.split(',')
+    const origins = config.allowedUrls
     const index = origins.indexOf(req.headers.origin)
     res.set({
         'Access-Control-Allow-Origin': origins[index],
-        'Access-Control-Allow-Headers': process.env.ALLOWED_HEADERS,
-        'Access-Control-Allow-Methods': process.env.ALLOWED_METHODS
+        'Access-Control-Allow-Headers': config.allowedHeaders,
+        'Access-Control-Allow-Methods': config.allowedMethods
     })
     if (req.method === 'OPTIONS') {
         res.status(200).json({})
@@ -29,7 +30,7 @@ route.use(fileupload({
 }))
 
 route.delete('/', (req, res) => {
-    if (process.env.SECRET === req.header('x-access-token')) {
+    if (config.secret === req.header('x-access-token')) {
         unlink('./public' + req.headers.img_path, (err) => {
             if (err) {
                 res.status(500).json({err})
@@ -46,21 +47,29 @@ route.use((req, res, next) => {
     const token = req.header('x-access-token')
     if (!token) res.status(300).json({msg: 'A token is required'})
     const options = {
-        hostname: 'codeship-api.herokuapp.com',
-        port: 443,
+        hostname: config.codeshipApi.hostname,
+        port: 5000,
         path: '/token/img_path',
         method: 'GET',
         headers: {'x-access-token': token}
     }
-    get(options, request => {
-        let response = ''
-        request.on('data', data => response += data)
-        request.on('end', () => {
-            req.img_path = JSON.parse(response).img_path
-            next()
+    if (config.mode !== 'PROD') {
+        import('http').then(({get}) => getImgPath(get))
+    } else {
+        getImgPath(get)
+    }
+
+    function getImgPath(get) {
+        get(options, request => {
+            let response = ''
+            request.on('data', data => response += data)
+            request.on('end', () => {
+                req.img_path = JSON.parse(response).img_path
+                next()
+            })
+            request.on('error', err => console.log(err))
         })
-        request.on('error', err => console.log(err))
-    }).end()
+    }
 })
 
 route.put('/', (req, res) => {
@@ -68,4 +77,4 @@ route.put('/', (req, res) => {
     res.status(200).json({path: req.body.path, msg: 'The image is upload!'})
 })
 
-route.listen(process.env.PORT)
+route.listen(config.port)
