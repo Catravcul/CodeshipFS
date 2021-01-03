@@ -5,6 +5,20 @@ import fileupload from 'express-fileupload'
 import express from 'express'
 const route = express()
 
+route.use((req, res, next) => {
+    const origins = process.env.ALLOWED_URLS.split(',')
+    const index = origins.indexOf(req.headers.origin)
+    res.set({
+        'Access-Control-Allow-Origin': origins[index],
+        'Access-Control-Allow-Headers': process.env.ALLOWED_HEADERS
+    })
+    if (req.method === 'OPTIONS') {
+        res.status(200).json({})
+    } else {
+        next()
+    }
+})
+
 route.use(express.static(join(process.cwd(), 'public')))
 route.use(fileupload({
     limits: {fileSize: 6 * 1024 * 1024},
