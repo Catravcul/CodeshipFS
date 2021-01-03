@@ -1,5 +1,6 @@
 import 'dotenv/config.js'
 import { join } from 'path'
+import { unlink } from 'fs'
 import { get, request } from 'https'
 import fileupload from 'express-fileupload'
 import express from 'express'
@@ -10,7 +11,8 @@ route.use((req, res, next) => {
     const index = origins.indexOf(req.headers.origin)
     res.set({
         'Access-Control-Allow-Origin': origins[index],
-        'Access-Control-Allow-Headers': process.env.ALLOWED_HEADERS
+        'Access-Control-Allow-Headers': process.env.ALLOWED_HEADERS,
+        'Access-Control-Allow-Methods': process.env.ALLOWED_METHODS
     })
     if (req.method === 'OPTIONS') {
         res.status(200).json({})
@@ -25,6 +27,20 @@ route.use(fileupload({
     useTempFiles: true,
     tempFileDir: '/tmp/'
 }))
+
+route.delete('/', (req, res) => {
+    if (process.env.SECRET === req.header('x-access-token')) {
+        unlink('./public' + req.headers.img_path, (err) => {
+            if (err) {
+                res.status(500).json({err})
+            } else {
+                res.status(200).json({msg: 'image erased'})
+            }
+        })
+    } else {
+        res.status(300).json({msg: 'access denied!'})
+    }
+})
 
 route.use((req, res, next) => {
     const token = req.header('x-access-token')
