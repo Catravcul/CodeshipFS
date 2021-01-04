@@ -1,5 +1,5 @@
-import User from './userModel'
-exports.update = async (req, res) => {
+import User from './userModel.js'
+export const update = async (req, res) => {
     try {
         if (req.files.img) {
             const body = {img_path: '/img/user/' + req.username + getExt(req.files.img.mimetype)}

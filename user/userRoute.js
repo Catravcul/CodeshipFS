@@ -1,11 +1,6 @@
-const express = require('express')
-const { update } = require('./userController')
-const route = express.Router()
+import express from 'express'
+import { update } from './userController.js'
+export const userRoute = express.Router()
 
-
-route.route('/')
+userRoute.route('/')
 .patch( update )
-
-module.exports = {
-    userRoute: route
-}
