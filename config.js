@@ -44,7 +44,6 @@ function getCompleteConfig(config) {
         mode,
         port: process.env.PORT,
         allowedHeaders:process.env.ALLOWED_HEADERS,
-        allowedMethods:process.env.ALLOWED_METHODS,
-        secret: process.env.SECRET
+        allowedMethods:process.env.ALLOWED_METHODS
     });
 }
