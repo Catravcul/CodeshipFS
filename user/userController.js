@@ -29,11 +29,11 @@ export const update = async (req, res) => {
       }
   }
 /**
- * set extention as string ".[ext]" to req.body.img_type
- * @param {express.req} req 
+ * return extention pending on mimetype
+ * @param {string} req 
  */
-function getExt(req) {
-    switch (req.body.img_type) {
+function getExt(img_type) {
+    switch (img_type) {
       case 'image/gif':
         return '.gif'
       case 'image/jpeg':
