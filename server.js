@@ -1,6 +1,5 @@
 import { getConfig } from './config.js'
 import { join } from 'path'
-import { unlink } from 'fs'
 import { get } from 'https'
 import { userRoute } from './user/userRoute.js'
 import mongoose from 'mongoose'
@@ -41,20 +40,6 @@ route.use(fileupload({
     tempFileDir: '/tmp/'
 }))
 
-route.delete('/', (req, res) => {
-    if (config.secret === req.header('x-access-token')) {
-        unlink('./public' + req.headers.img_path, (err) => {
-            if (err) {
-                res.status(500).json({err})
-            } else {
-                res.status(200).json({msg: 'image erased'})
-            }
-        })
-    } else {
-        res.status(300).json({msg: 'access denied!'})
-    }
-})
-
 route.use((req, res, next) => {
     const token = req.header('x-access-token')
     if (!token) res.status(300).json({msg: 'A token is required'})
@@ -82,7 +67,6 @@ route.use((req, res, next) => {
                 } else {
                     req.id = id
                     req.username = username
-                    console.log(req.id, req.username)
                     next()
                 }
             })
