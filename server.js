@@ -2,10 +2,12 @@ import { getConfig } from './config.js'
 import { join } from 'path'
 import { unlink } from 'fs'
 import { get } from 'https'
+import { userRoute } from './user/userRoute'
 import fileupload from 'express-fileupload'
 import express from 'express'
 const route = express()
 const config = getConfig()
+
 
 route.use((req, res, next) => {
     const origins = config.allowedUrls
@@ -72,9 +74,6 @@ route.use((req, res, next) => {
     }
 })
 
-route.put('/', (req, res) => {
-    req.files.img.mv('public' + req.body.path)
-    res.status(200).json({path: req.body.path, msg: 'The image is upload!'})
-})
+route.use('/user', userRoute)
 
 route.listen(config.port)
