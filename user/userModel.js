@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema({
   },
   img_path: {
     type: String,
-    default: '/img/user/profile.jpg'
+    default: '/img/user/profile.webp'
   },
   cart: {
     type: Array,
