@@ -1,11 +1,15 @@
-import { unlink } from 'fs'
+import { existsSync, unlink } from 'fs'
 import User from './userModel.js'
 
 export const update = async (req, res) => {
     try {
         if (req.files.img) {
             const user = await User.findById(req.id)
-            unlink('./public' + user.img_path, update)
+            if (existsSync('./public' + user.img_path, update)) {
+              unlink('./public' + user.img_path, update)
+            } else {
+              update()
+            }
         } else {
             res.status(400).json({
               err: 'img file could not be found in files'
