@@ -2,26 +2,18 @@ import { getConfig } from './config.js'
 import { join } from 'path'
 import { get } from 'https'
 import { userRoute } from './user/userRoute.js'
+import cors from 'cors'
 import mongoose from 'mongoose'
 import fileupload from 'express-fileupload'
 import express from 'express'
 const route = express()
 const config = getConfig()
 
-route.use((req, res, next) => {
-    const origins = config.allowedUrls
-    const index = origins.indexOf(req.headers.origin)
-    res.set({
-        'Access-Control-Allow-Origin': origins[index],
-        'Access-Control-Allow-Headers': config.allowedHeaders,
-        'Access-Control-Allow-Methods': config.allowedMethods
-    })
-    if (req.method === 'OPTIONS') {
-        res.status(200).json({})
-    } else {
-        return next()
-    }
-})
+route.use(cors({
+    origin: config.allowedUrls,
+    allowedHeaders: config.allowedHeaders,
+    methods: config.allowedMethods
+}))
 
 route.use(express.static(join(process.cwd(), 'public')))
 
