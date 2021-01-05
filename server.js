@@ -69,4 +69,5 @@ route.use((req, res, next) => {
 
 route.use('/user', userRoute)
 
+route.use('*', (req, res) => res.status(300).json({err: 'route not found'}))
 route.listen(config.port)
