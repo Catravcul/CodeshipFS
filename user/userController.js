@@ -17,27 +17,19 @@ export const update = async (req, res) => {
         })
     }
 
-    async function update(err) {
-        if (err) {
-            console.log(err)
-            res.status(500).json({err})
-        } else {
-            const body = {img_path: '/img/user/' + req.username + getExt(req.files.img.mimetype)}
-            const updated = await User.findByIdAndUpdate(
-            req.id,
-            body,
-            {
-                new: true,
-                runValidators: true,
-            }
-            )
-            let mvErr
-            req.files.img.mv('public' + body.img_path, err => mvErr = err)
-            res.status(200).json({
-            user: updated,
-            err: mvErr
-            })
-        }
+    async function update() {
+        const body = {img_path: '/img/user/' + req.username + getExt(req.files.img.mimetype)}
+        const updated = await User.findByIdAndUpdate(req.id, body, {
+            new: true,
+            runValidators: true,
+        })
+        let mvErr
+        req.files.img.mv('public' + body.img_path, err => mvErr = err)
+        res.status(200).json({
+        user: updated,
+        err: mvErr
+        })
+        
     }
 }
       
