@@ -39,37 +39,37 @@ route.use((req, res, next) => {
     } else {
         const options = {
             hostname: config.codeshipApi.hostname,
-            port: 5000,
             path: '/token/data',
             method: 'GET',
             headers: {'x-access-token': token}
         }
         if (config.mode !== 'PROD') {
+            options.port = 5000
             import('http').then(({get}) => getImgPath(get))
         } else {
             getImgPath(get)
         }
-    }
 
-    function getImgPath(get) {
-        try {
-            get(options, request => {
-                let response = ''
-                request.on('data', data => response += data)
-                request.on('end', () => {
-                    const {id, username, err} = JSON.parse(response)
-                    if (err) {
-                        res.status(300).json({err})
-                    } else {
-                        req.id = id
-                        req.username = username
-                        next()
-                    }
-                })
-                request.on('error', err => res.status(300).json({err}))
-            }).on('error', err => res.status(300).json({err}))
-        } catch (err) {
-            res.status(300).json({err})
+        function getImgPath(get) {
+            try {
+                get(options, request => {
+                    let response = ''
+                    request.on('data', data => response += data)
+                    request.on('end', () => {
+                        const {id, username, err} = JSON.parse(response)
+                        if (err) {
+                            res.status(300).json({err})
+                        } else {
+                            req.id = id
+                            req.username = username
+                            next()
+                        }
+                    })
+                    request.on('error', err => res.status(300).json({err}))
+                }).on('error', err => res.status(300).json({err}))
+            } catch (err) {
+                res.status(300).json({err})
+            }
         }
     }
 })
