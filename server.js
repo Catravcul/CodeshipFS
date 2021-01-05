@@ -34,18 +34,21 @@ route.use(fileupload({
 
 route.use((req, res, next) => {
     const token = req.header('x-access-token')
-    if (!token) res.status(300).json({msg: 'A token is required'})
-    const options = {
-        hostname: config.codeshipApi.hostname,
-        port: 5000,
-        path: '/token/data',
-        method: 'GET',
-        headers: {'x-access-token': token}
-    }
-    if (config.mode !== 'PROD') {
-        import('http').then(({get}) => getImgPath(get))
+    if (!token) {
+        res.status(300).json({msg: 'A token is required'})
     } else {
-        getImgPath(get)
+        const options = {
+            hostname: config.codeshipApi.hostname,
+            port: 5000,
+            path: '/token/data',
+            method: 'GET',
+            headers: {'x-access-token': token}
+        }
+        if (config.mode !== 'PROD') {
+            import('http').then(({get}) => getImgPath(get))
+        } else {
+            getImgPath(get)
+        }
     }
 
     function getImgPath(get) {
