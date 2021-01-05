@@ -49,21 +49,25 @@ route.use((req, res, next) => {
     }
 
     function getImgPath(get) {
-        get(options, request => {
-            let response = ''
-            request.on('data', data => response += data)
-            request.on('end', () => {
-                const {id, username, status, message} = JSON.parse(response)
-                if (status === 'fail') {
-                    res.status(300).json({status, message})
-                } else {
-                    req.id = id
-                    req.username = username
-                    next()
-                }
-            })
-            request.on('error', err => console.log(err))
-        })
+        try {
+            get(options, request => {
+                let response = ''
+                request.on('data', data => response += data)
+                request.on('end', () => {
+                    const {id, username, err} = JSON.parse(response)
+                    if (err) {
+                        res.status(300).json({err})
+                    } else {
+                        req.id = id
+                        req.username = username
+                        next()
+                    }
+                })
+                request.on('error', err => res.status(300).json({err}))
+            }).on('error', err => res.status(300).json({err}))
+        } catch (err) {
+            res.status(300).json({err})
+        }
     }
 })
 
