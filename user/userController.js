@@ -5,7 +5,7 @@ export const update = async (req, res) => {
     try {
         if (req.files.img) {
             const user = await User.findById(req.id)
-            if (existsSync('./public' + user.img_path, update)) {
+            if (existsSync('./public' + user.img_path)) {
               unlink('./public' + user.img_path, update)
             } else {
               update()
