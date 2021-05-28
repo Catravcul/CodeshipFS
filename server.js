@@ -2,6 +2,7 @@ import { getConfig } from './config.js'
 import { join } from 'path'
 import { get } from 'https'
 import { userRoute } from './user/userRoute.js'
+import appointmentRoute from './appointment/route.js'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import fileupload from 'express-fileupload'
@@ -15,7 +16,12 @@ route.use(cors({
     methods: config.allowedMethods
 }))
 
+
 route.use(express.static(join(process.cwd(), 'public')))
+    
+route.use(fileupload({
+    limits: {fileSize: 2 * 1024 * 1024}
+}))
 
 mongoose.connect(config.DB, {
     useNewUrlParser: true,
@@ -25,12 +31,8 @@ mongoose.connect(config.DB, {
 })
 .then(() => console.log('connection successfull'))
 .catch((err) => console.log(err.message))
-    
-route.use(fileupload({
-    limits: {fileSize: 6 * 1024 * 1024},
-    useTempFiles: true,
-    tempFileDir: '/tmp/'
-}))
+
+route.use('/appointment', appointmentRoute)
 
 route.use((req, res, next) => {
     const token = req.header('x-access-token')
