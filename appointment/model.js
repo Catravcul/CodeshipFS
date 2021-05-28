@@ -1,5 +1,12 @@
 import mongoose from 'mongoose'
 import validator from 'validator'
+
+const getDefaultDate = () => {
+  const date = new Date()
+  date.setDate(date.getDate() + 30)
+  return date
+}
+
 const appointmentSchema = new mongoose.Schema({
   message: {
     type: String,
@@ -21,11 +28,6 @@ const appointmentSchema = new mongoose.Schema({
     default: getDefaultDate()
   }
 });
-const getDefaultDate = () => {
-  const date = new Date()
-  date.setDate(date.getDate() + 30)
-  return date
-}
 const Appointment = mongoose.model('appointment', appointmentSchema);
 
 export default Appointment
