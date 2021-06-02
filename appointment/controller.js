@@ -38,7 +38,7 @@ export const getStatus = (req, res) => {
             isFull: false
         }),
         unavailible: (nearestDeliveryDate) => res.status(200).json({
-            message: 'Sorry, orders have been sold out until "' + nearestDeliveryDate + '", you can still contact by social networks, phone or email.',
+            message: 'Sorry, orders have been sold out, the last one finishes on "' + nearestDeliveryDate + '", you can still contact by social networks, phone or email.',
             isFull: true
         })
     }
@@ -47,9 +47,9 @@ export const getStatus = (req, res) => {
         details: error.message
     })
     try {
-        Appointment.find(null, 'date').sort({date: 1, email: 1}).then(docs => {
+        Appointment.find(null, 'deliverDateMax').sort({deliverDateMax: 1, email: 1}).then(docs => {
             if (docs.length < 10) return success.availible()
-            return success.unavailible(docs[0].date.toDateString())
+            return success.unavailible(docs[0].deliverDateMax.toDateString())
         })
     } catch (error) {
         fail(error)
