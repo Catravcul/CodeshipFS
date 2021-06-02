@@ -1,4 +1,5 @@
-import 'dotenv/config.js'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const mode = process.env.ENV_MODE
 
